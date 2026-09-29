@@ -1,0 +1,44 @@
+{
+  "default_version": "2026",
+  "versions": {
+    "2026": {
+      "name": "ZWCAD 2026",
+      "sdk_path": "D:\\zwcad\\ZRXSDK",
+      "arx_base": "AutoCAD 2024",
+      "toolset": "v141",
+      "dotnet_framework": "4.7",
+      "enabled": true
+    },
+    "2025": {
+      "name": "ZWCAD 2025",
+      "sdk_path": "",
+      "arx_base": "AutoCAD 2024",
+      "toolset": "v141",
+      "dotnet_framework": "4.7",
+      "enabled": false,
+      "binary_compatible_with": "2026"
+    },
+    "2024": {
+      "name": "ZWCAD 2024",
+      "sdk_path": "",
+      "arx_base": "AutoCAD 2019",
+      "toolset": "v141",
+      "dotnet_framework": "4.7",
+      "enabled": false
+    },
+    "nova": {
+      "name": "ZWCAD Nova (Cross-Platform Qt/C++)",
+      "sdk_path": "",
+      "build_system": "CMake",
+      "framework": "Qt 6",
+      "platforms": ["windows", "macos", "linux", "harmonyos"],
+      "enabled": false,
+      "notes": "Reserved for future Nova cross-platform SDK"
+    }
+  },
+  "build_defaults": {
+    "vcvarsall_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat",
+    "fallback_vcvarsall_search": true,
+    "hot_reload_rename": true
+  }
+}

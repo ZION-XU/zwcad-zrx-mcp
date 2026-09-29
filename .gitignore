@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C++ Build artifacts
+*.obj
+*.exp
+*.lib
+*.old
+*.pdb
+*.idb
+*.ilk
+*.tlog
+
+# Plugin outputs (keep sample clean)
+*.zrx
+
+# Temporary extraction files
+temp_extract/
+test_chm/
+test_diff/
+
+# IDE / Editor configs
+.vscode/
+.cursor/
+.idea/
+
+# Environment files
+.env
