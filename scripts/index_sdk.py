@@ -9,25 +9,36 @@ from core.extractor import extractor
 from core.knowledge_db import knowledge_db
 
 def main():
-    print("=== Starting ZRX SDK Knowledge Base Indexing ===")
+    print("==================================================")
+    print("=== Starting ZRX Multi-Version Knowledge Base Indexing ===")
+    print("==================================================")
     knowledge_db.clear()
-    
-    # 1. Known differences
+
+    # 1. 2026 Known differences (AutoCAD vs ZRX)
     extractor.index_known_differences(version="2026")
 
-    # 2. Chinese Guide 2026
-    extractor.index_guide_chs(version="2026")
+    # 2. 2026 Chinese Developer Guide (ZWCAD_ZRX_Guide_chs_2026.chm)
+    extractor.index_guide_chs_2026(version="2026")
 
-    # 3. Migration manual
-    extractor.index_migration_manual(version="2026")
+    # 3. 2026 Chinese Migration Manual (ZWCAD_ZRX_Migration_chs_2026.chm)
+    extractor.index_migration_chs_2026(version="2026")
 
-    # 4. Header index
-    extractor.index_headers(version="2026")
+    # 4. 2025 Chinese Migration Manual (ZWCAD_ZRX_Migration_Manual_chs_2025.chm)
+    extractor.index_migration_chs_2025(version="2025")
 
+    # 5. 2025 Developer Guide (ZWCAD_ZRXDev_enu_2025.chm)
+    extractor.index_guide_enu_2025(version="2025")
+
+    # 6. C++ Headers (Universal 'all' for 2025 & 2026 binary compatibility)
+    extractor.index_headers(version="all")
+
+    # Cleanup temp extracted files
     extractor.cleanup()
 
     stats = knowledge_db.get_stats()
-    print("=== Indexing Completed ===")
+    print("==================================================")
+    print("=== Indexing Completed Successfully ===")
+    print("==================================================")
     print("Knowledge DB Stats:", stats)
 
 if __name__ == "__main__":

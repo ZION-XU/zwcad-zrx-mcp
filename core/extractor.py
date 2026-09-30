@@ -11,19 +11,35 @@ from bs4 import BeautifulSoup
 from .config import config_mgr
 from .knowledge_db import knowledge_db
 
+SEVEN_ZIP_PATH = r"C:\Program Files\7-Zip\7z.exe"
+DEFAULT_DOCS_DIR = Path(r"D:\zwcad\zrx-document")
+
 class SdkExtractor:
     def __init__(self, temp_dir: Optional[Path] = None):
         self.temp_dir = temp_dir or (Path(__file__).resolve().parent.parent / "temp_extract")
 
     def decompile_chm(self, chm_path: Path, out_dir: Path) -> bool:
-        if not chm_path.exists():
+        if not chm_path or not chm_path.exists():
+            print(f"[WARN] CHM not found: {chm_path}")
             return False
         out_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Priority 1: 7-Zip
+        if os.path.exists(SEVEN_ZIP_PATH):
+            try:
+                cmd = f'"{SEVEN_ZIP_PATH}" x "{str(chm_path)}" "-o{str(out_dir)}" -r -y'
+                res = subprocess.run(cmd, shell=True, capture_output=True)
+                if res.returncode == 0:
+                    time.sleep(0.2)
+                    return True
+            except Exception as e:
+                print(f"[WARN] 7-Zip extraction failed for {chm_path.name}: {e}")
+
+        # Priority 2: Windows hh.exe
         try:
-            cmd = f'hh.exe -decompile {str(out_dir)} {str(chm_path)}'
+            cmd = f'hh.exe -decompile "{str(out_dir)}" "{str(chm_path)}"'
             subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            # Small wait to ensure filesystem flush
-            time.sleep(0.3)
+            time.sleep(0.5)
             return True
         except Exception as e:
             print(f"[ERROR] Failed to decompile {chm_path}: {e}")
@@ -31,29 +47,44 @@ class SdkExtractor:
 
     def extract_text_from_html(self, html_path: Path) -> Optional[Dict[str, str]]:
         try:
+            raw = html_path.read_bytes()
+            if not raw or len(raw) < 10:
+                return None
+
+            # Detect charset from meta tag
+            charset_match = re.search(rb'charset\s*=\s*["\']?([a-zA-Z0-9_\-]+)', raw[:2048], re.IGNORECASE)
+            detected_enc = charset_match.group(1).decode("ascii", errors="ignore").lower() if charset_match else None
+
+            candidates = []
+            if detected_enc in ["gb2312", "gbk", "gb18030"]:
+                candidates = ["gb18030", "utf-8", "latin-1"]
+            elif detected_enc in ["utf-8", "utf8"]:
+                candidates = ["utf-8", "gb18030", "latin-1"]
+            else:
+                candidates = ["gb18030", "utf-8", "latin-1"]
+
             content = None
-            for enc in ["utf-8", "gb18030", "gb2312", "latin-1"]:
+            for enc in candidates:
                 try:
-                    with open(html_path, "r", encoding=enc) as f:
-                        content = f.read()
+                    content = raw.decode(enc)
                     break
                 except UnicodeDecodeError:
                     continue
+
             if not content:
                 return None
+
             soup = BeautifulSoup(content, "html.parser")
-            
-            # Remove scripts and styles
             for s in soup(["script", "style"]):
                 s.extract()
 
             title = soup.title.string.strip() if soup.title and soup.title.string else html_path.stem
-            
-            # Get text
+            title = re.sub(r'[\r\n\t]+', ' ', title).strip()
+
             text = soup.get_text(separator="\n")
             lines = [l.strip() for l in text.splitlines() if l.strip()]
             clean_text = "\n".join(lines)
-            
+
             if len(clean_text) < 30:
                 return None
 
@@ -64,12 +95,25 @@ class SdkExtractor:
         except Exception:
             return None
 
+    def _find_doc_file(self, filename: str, fallback_sdk_subpath: Optional[str] = None) -> Optional[Path]:
+        # 1. Search D:\zwcad\zrx-document
+        p1 = DEFAULT_DOCS_DIR / filename
+        if p1.exists():
+            return p1
+
+        # 2. Search SDK path if configured
+        if fallback_sdk_subpath:
+            sdk_path = config_mgr.get_sdk_path("2026")
+            if sdk_path:
+                p2 = sdk_path / fallback_sdk_subpath
+                if p2.exists():
+                    return p2
+        return None
+
     def index_known_differences(self, version: str = "2026"):
-        sdk_path = config_mgr.get_sdk_path(version)
-        if not sdk_path:
-            return
-        chm = sdk_path / "Doc" / "KnownDifferences.chm"
-        if not chm.exists():
+        chm = self._find_doc_file("KnownDifferences.chm", "Doc/KnownDifferences.chm")
+        if not chm:
+            print("[WARN] KnownDifferences.chm not found.")
             return
 
         print(f"Indexing KnownDifferences from {chm} ...")
@@ -91,21 +135,14 @@ class SdkExtractor:
                 knowledge_db.add_docs_batch(docs)
                 print(f"Added {len(docs)} KnownDifferences documents.")
 
-    def index_guide_chs(self, version: str = "2026"):
-        sdk_path = config_mgr.get_sdk_path(version)
-        if not sdk_path:
+    def index_guide_chs_2026(self, version: str = "2026"):
+        chm = self._find_doc_file("ZWCAD_ZRX_Guide_chs_2026.chm", "ZWCAD_ZRX_Guide_chs_2026.chm")
+        if not chm:
+            print("[WARN] ZWCAD_ZRX_Guide_chs_2026.chm not found.")
             return
-        chm = sdk_path / "ZWCAD_ZRX_Guide_chs_2026.chm"
-        if not chm.exists():
-            # Check root doc folder
-            alt_chm = Path(r"D:\zwcad\zrx-document\ZWCAD_ZRX_Guide_chs_2026.chm")
-            if alt_chm.exists():
-                chm = alt_chm
-            else:
-                return
 
-        print(f"Indexing ZRX Guide (CHS) from {chm} ...")
-        out_dir = self.temp_dir / "guide_chs"
+        print(f"Indexing ZRX Guide 2026 (CHS) from {chm} ...")
+        out_dir = self.temp_dir / "guide_chs_2026"
         if self.decompile_chm(chm, out_dir):
             docs = []
             for html_file in out_dir.rglob("*.htm*"):
@@ -117,22 +154,20 @@ class SdkExtractor:
                         "title": parsed["title"],
                         "symbol": "",
                         "content": parsed["content"],
-                        "url_or_path": f"Guide_CHS/{html_file.name}"
+                        "url_or_path": f"Guide_CHS_2026/{html_file.name}"
                     })
             if docs:
                 knowledge_db.add_docs_batch(docs)
-                print(f"Added {len(docs)} ZRX Guide (CHS) documents.")
+                print(f"Added {len(docs)} ZRX Guide 2026 (CHS) documents.")
 
-    def index_migration_manual(self, version: str = "2026"):
-        sdk_path = config_mgr.get_sdk_path(version)
-        if not sdk_path:
-            return
-        chm = sdk_path / "Doc" / "ZRX_Migration_Manual.chm"
-        if not chm.exists():
+    def index_migration_chs_2026(self, version: str = "2026"):
+        chm = self._find_doc_file("ZWCAD_ZRX_Migration_chs_2026.chm", "Doc/ZRX_Migration_Manual.chm")
+        if not chm:
+            print("[WARN] ZWCAD_ZRX_Migration_chs_2026.chm not found.")
             return
 
-        print(f"Indexing ZRX Migration Manual from {chm} ...")
-        out_dir = self.temp_dir / "migration"
+        print(f"Indexing ZRX Migration 2026 (CHS) from {chm} ...")
+        out_dir = self.temp_dir / "migration_chs_2026"
         if self.decompile_chm(chm, out_dir):
             docs = []
             for html_file in out_dir.rglob("*.htm*"):
@@ -144,21 +179,71 @@ class SdkExtractor:
                         "title": parsed["title"],
                         "symbol": "",
                         "content": parsed["content"],
-                        "url_or_path": f"Migration/{html_file.name}"
+                        "url_or_path": f"Migration_CHS_2026/{html_file.name}"
                     })
             if docs:
                 knowledge_db.add_docs_batch(docs)
-                print(f"Added {len(docs)} Migration documents.")
+                print(f"Added {len(docs)} Migration 2026 (CHS) documents.")
 
-    def index_headers(self, version: str = "2026"):
-        sdk_path = config_mgr.get_sdk_path(version)
+    def index_migration_chs_2025(self, version: str = "2025"):
+        chm = self._find_doc_file("ZWCAD_ZRX_Migration_Manual_chs_2025.chm")
+        if not chm:
+            print("[WARN] ZWCAD_ZRX_Migration_Manual_chs_2025.chm not found.")
+            return
+
+        print(f"Indexing ZRX Migration 2025 (CHS) from {chm} ...")
+        out_dir = self.temp_dir / "migration_chs_2025"
+        if self.decompile_chm(chm, out_dir):
+            docs = []
+            for html_file in out_dir.rglob("*.htm*"):
+                parsed = self.extract_text_from_html(html_file)
+                if parsed:
+                    docs.append({
+                        "version": version,
+                        "category": "migration",
+                        "title": parsed["title"],
+                        "symbol": "",
+                        "content": parsed["content"],
+                        "url_or_path": f"Migration_CHS_2025/{html_file.name}"
+                    })
+            if docs:
+                knowledge_db.add_docs_batch(docs)
+                print(f"Added {len(docs)} Migration 2025 (CHS) documents.")
+
+    def index_guide_enu_2025(self, version: str = "2025"):
+        chm = self._find_doc_file("ZWCAD_ZRXDev_enu_2025.chm")
+        if not chm:
+            print("[WARN] ZWCAD_ZRXDev_enu_2025.chm not found.")
+            return
+
+        print(f"Indexing ZRX Developer Guide 2025 (ENU) from {chm} ...")
+        out_dir = self.temp_dir / "guide_enu_2025"
+        if self.decompile_chm(chm, out_dir):
+            docs = []
+            for html_file in out_dir.rglob("*.htm*"):
+                parsed = self.extract_text_from_html(html_file)
+                if parsed:
+                    docs.append({
+                        "version": version,
+                        "category": "guide",
+                        "title": parsed["title"],
+                        "symbol": "",
+                        "content": parsed["content"],
+                        "url_or_path": f"Guide_ENU_2025/{html_file.name}"
+                    })
+            if docs:
+                knowledge_db.add_docs_batch(docs)
+                print(f"Added {len(docs)} Developer Guide 2025 (ENU) documents.")
+
+    def index_headers(self, version: str = "all"):
+        sdk_path = config_mgr.get_sdk_path("2026")
         if not sdk_path:
             return
         inc_dir = sdk_path / "inc"
         if not inc_dir.exists():
             return
 
-        print(f"Indexing C++ headers from {inc_dir} ...")
+        print(f"Indexing C++ headers from {inc_dir} (version={version}) ...")
         docs = []
         class_regex = re.compile(r'class\s+([A-Z0-9_]+)\s*([A-Za-z0-9_]+)?\s*:\s*public\s+([A-Za-z0-9_]+)', re.IGNORECASE)
 
@@ -191,6 +276,9 @@ class SdkExtractor:
 
     def cleanup(self):
         if self.temp_dir.exists():
-            shutil.rmtree(self.temp_dir, ignore_errors=True)
+            try:
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+            except Exception:
+                pass
 
 extractor = SdkExtractor()

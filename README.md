@@ -34,13 +34,14 @@ https://github.com/user-attachments/assets/8cfc8528-31e3-4323-9531-cc0d1240749f
 1. **无 IDE 闭环开发与热构建（Headless & Hot-Rebuild）**：
    - 彻底摆脱 Visual Studio 图形界面，在 Cursor / OpenCode / 终端中由 AI 直接编排 MSVC 命令行完成秒级编译。
    - **防文件锁自动重命名机制**：若当前 `.zrx` 正被运行中的 ZWCAD 占用，自动重命名旧文件并生成新插件，**开发全过程 CAD 无需关闭重启**！
-2. **多版本管理与“Nova”跨平台预留**：
+2. **多版本管理与面向未来版本兼容**：
    - 默认激活 **ZWCAD 2026**。
    - 内置 **2025** 二进制兼容智能识别与回退机制。
    - 预设 **2024** 本地 SDK 配置插槽。
+   - **平滑兼容未来版本**：基于模块化与解耦设计，原生支持向未来更高版本平滑迁移与跨平台扩展。
 3. **内置毫秒级官方知识库（SQLite FTS5）**：
-   - 提取并索引了 **662 篇** 中望官方中文指南、AutoCAD ↔ ZRX 差异表、迁移手册以及 582 个 C++ 核心头文件。
-   - 离线仅 **2.9 MB**，毫秒级全文检索，零幻觉！
+   - 提取并索引了 **880+ 篇** 中望官方指南、AutoCAD ↔ ZRX 差异表、2025/2026 迁移手册以及全套核心头文件。
+   - 离线仅 **3.5 MB**，毫秒级全文检索，零幻觉！
 4. **官方 Samples 真实代码检索**：
    - 毫秒级提取本地 SDK `samples/` 中的生产级源码示范。
 5. **脚手架与样板生成**：
@@ -135,8 +136,8 @@ General LLMs frequently produce AutoCAD-specific code (`AcDb...`, `acrxEntryPoin
 
 * **Headless & Hot-Rebuild Workflow**: Compile plugins via MSVC CLI directly from your AI agent without ever opening Visual Studio.
 * **CAD Process File Lock Protection**: Automatically renames locked `.zrx` files so you can rebuild without restarting ZWCAD.
-* **Multi-Version Architecture**: Native support for ZWCAD 2026, binary compatibility fallback for 2025, slot for 2024, and future-proof design for Project Nova (Qt/C++ cross-platform).
-* **Pre-Indexed SQLite FTS5 Knowledge Base**: 662 parsed documents covering Chinese development guides, Known Differences vs ObjectARX, Migration guides, and 582 C++ header symbols in under 3MB!
+* **Multi-Version Architecture**: Native support for ZWCAD 2026, binary compatibility fallback for 2025, slot for 2024, and future-proof design for upcoming CAD versions.
+* **Pre-Indexed SQLite FTS5 Knowledge Base**: 880+ parsed documents covering official development guides, Known Differences vs ObjectARX, 2025/2026 Migration manuals, and C++ header symbols in under 3.5MB!
 * **Production Boilerplate Generation**: High-quality skeletons for `ZcDbEntity`, `ZcEdJig`, and safe transaction handling.
 
 ### 🎬 Live Demo Showcase

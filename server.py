@@ -19,7 +19,7 @@ app = MCPServer("zrx-developer")
 @app.tool()
 def zrx_status() -> dict:
     """
-    Check the current ZRX-MCP configuration, detected SDK paths, supported CAD versions (2026/2025/2024/Nova),
+    Check the current ZRX-MCP configuration, detected SDK paths, supported CAD versions (2026/2025/2024/future),
     compiler availability (vcvarsall), and knowledge database document stats.
     """
     status = config_mgr.get_all_status()
