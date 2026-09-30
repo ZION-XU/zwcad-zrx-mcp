@@ -9,7 +9,8 @@
 > **中望 CAD (ZWCAD) ZRX 插件二次开发专属 MCP 服务**  
 > 专为 **AI Coding（Cursor / Claude Desktop / Antigravity / OpenCode / VS Code）** 打造的无 IDE（Headless/Harness-First）全自动开发工具链与官方知识库。  
 > *A dedicated Model Context Protocol (MCP) server for ZWCAD (中望CAD) ZRX secondary development, optimized for AI coding assistants and headless CLI build workflows.*
-
+演示视频：
+https://github.com/user-attachments/assets/8cfc8528-31e3-4323-9531-cc0d1240749f
 ---
 
 [中文文档 (Chinese)](#中文说明) | [English Documentation](#english-documentation)
