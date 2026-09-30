@@ -38,7 +38,6 @@ https://github.com/user-attachments/assets/8cfc8528-31e3-4323-9531-cc0d1240749f
    - 默认激活 **ZWCAD 2026**。
    - 内置 **2025** 二进制兼容智能识别与回退机制。
    - 预设 **2024** 本地 SDK 配置插槽。
-   - **预留未来“Nova”插槽**：架构上采用 Python，未来可无缝接入 Nova 的 Qt 6 + CMake/Ninja 跨平台二开（Win/Mac/Linux/HarmonyOS）。
 3. **内置毫秒级官方知识库（SQLite FTS5）**：
    - 提取并索引了 **662 篇** 中望官方中文指南、AutoCAD ↔ ZRX 差异表、迁移手册以及 582 个 C++ 核心头文件。
    - 离线仅 **2.9 MB**，毫秒级全文检索，零幻觉！
