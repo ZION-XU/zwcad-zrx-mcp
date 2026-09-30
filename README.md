@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/8cfc8528-31e3-4323-9531-cc0d1240749f
 
 在当今 AI Coding 时代，通用大语言模型（Claude、GPT、DeepSeek）在编写 CAD 插件时普遍存在**“AutoCAD 惯性幻觉”**：
 1. **API 幻觉**：通用模型习惯写 AutoCAD ObjectARX 的 `AcDb...`、`acrxEntryPoint`、`addNewlyCreatedDBObject` 等函数，导致在中望 CAD (ZWCAD) 下直接编译报错。
-2. **知识被锁在二进制 CHM 中**：中望官方的开发指南、已知差异手册（`KnownDifferences.chm`）和接口参考均打包在 `.chm` 文件中，大模型无法直接查阅。
+2. **知识被锁在二进制 CHM 中**：中望官方的开发指南、参考手册和移植说明均打包在 `.chm` 文件中，大模型无法直接查阅。
 3. **IDE 强依赖与文件锁死痛点**：传统二开必须打开臃肿的 Visual Studio。当 ZWCAD 运行并加载了 `.zrx` 时，重新编译必报 `LNK1104 无法打开文件`，开发者不得不反复重启 CAD。
 
 **ZRX-MCP** 彻底终结了这些痛点！
