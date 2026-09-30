@@ -48,6 +48,22 @@ https://github.com/user-attachments/assets/8cfc8528-31e3-4323-9531-cc0d1240749f
    - 一键生成规范的 C++ ZRX 工程（带防锁 `build.py`）或 .NET C# 类库工程。
    - 一键生成自定义实体（`ZcDbEntity`）、JIG 动态拖拽（`ZcEdJig`）、事务安全提交等高难度样板代码。
 
+### 🎬 实战效果演示 (Live Demos)
+
+#### 1. 🤖 提示词驱动开发：一句话生成 ZRX 插件
+> 在 AI Coding 助手（如 Antigravity / Cursor）中输入自然语言需求，ZRX-MCP 自动完成官方知识库检索、核心 C++ 逻辑编写与热重载编译：
+
+![使用提示词与 ZRX-MCP 开发插件](assets/demo_mcp_workflow.gif)
+
+> 📹 *[查看/下载完整带声录屏 (MP4)](assets/demo_mcp_workflow.mp4)*
+
+#### 2. ⚡ 插件在中望 CAD 2026 中实机运行
+> 展示由 AI 生成的 `geodemo.zrx`：选中路线多段线后一键布设 27 个风机大圆与 81 个正南北等边三角形勘察孔，并自动生成原生 CAD 风机明细表与钻孔坐标表：
+
+![中望CAD实机运行风机布孔插件](assets/demo_cad_plugin.gif)
+
+> 📹 *[查看/下载完整高清录屏 (MP4)](assets/demo_cad_plugin.mp4)*
+
 ### 🛠️ 提供的 7 大 MCP 工具
 
 | 工具名 | 功能说明 |
@@ -123,6 +139,22 @@ General LLMs frequently produce AutoCAD-specific code (`AcDb...`, `acrxEntryPoin
 * **Multi-Version Architecture**: Native support for ZWCAD 2026, binary compatibility fallback for 2025, slot for 2024, and future-proof design for Project Nova (Qt/C++ cross-platform).
 * **Pre-Indexed SQLite FTS5 Knowledge Base**: 662 parsed documents covering Chinese development guides, Known Differences vs ObjectARX, Migration guides, and 582 C++ header symbols in under 3MB!
 * **Production Boilerplate Generation**: High-quality skeletons for `ZcDbEntity`, `ZcEdJig`, and safe transaction handling.
+
+### 🎬 Live Demo Showcase
+
+#### 1. 🤖 Prompt-Driven Plugin Development via ZRX-MCP
+> AI agent utilizes ZRX-MCP to query the official knowledge base, implement custom C++ geometry logic, and compile headless with hot-rebuild lock prevention:
+
+![ZRX-MCP Prompt Workflow](assets/demo_mcp_workflow.gif)
+
+> 📹 *[View / Download Full Video with Audio (MP4)](assets/demo_mcp_workflow.mp4)*
+
+#### 2. ⚡ Live Execution in ZWCAD 2026
+> Deploying the generated `geodemo.zrx` plugin: automatically placing 27 wind turbines and 81 boreholes in true-north equilateral triangles along a polyline, and generating native CAD coordinate tables:
+
+![ZWCAD Plugin Execution](assets/demo_cad_plugin.gif)
+
+> 📹 *[View / Download Full Video (MP4)](assets/demo_cad_plugin.mp4)*
 
 ### 📦 Configuration Example (Cursor / Claude / OpenCode)
 
